@@ -28,6 +28,7 @@ let botScore = 0
 
 console.log(buttons);
 
+// Filling the cell in both display HTML and board array
 function fillCell (cell) {
     if (buttons[cell].innerHTML == '' && !gameOver) {
         board[cell] = currentMove;
@@ -41,123 +42,64 @@ function fillCell (cell) {
     // if (!gameOver && enableAI) {botPick()}
 }
 
-function checkWin () {
-    const board = Array.from(buttons).map(button => button.innerHTML);
-    console.log(board);
-
-    for (const combination of winningCombinations) {
-        const [a, b, c] = combination;
-        if (board[a] !== "" && board[a] === board[b] && board[a] === board[c]) {
-            highlightWinningCells(a, b, c);
-            endGame(`Winner: ${board[a]}`);
-            if (board[a] === AIplayer) {
-                botScore++;
-                document.getElementById('botScore').innerHTML = botScore;
-            } else {
-                playerScore++;
-                document.getElementById('playerScore').innerHTML = playerScore;
-            }
-        };    
-    };
-    
-    if (!board.includes('') && !gameOver) {
-        endGame('Draw');
-        draws++;
-        document.getElementById('draws').innerHTML = draws;
-    }
-}
-
-function playAgain () {
-    for (cell of buttons) {
-        cell.innerHTML = '';
-        cell.classList.remove('winningCell');
-    };
-    gameOver = false;
-    currentMove = 'X';
-    for (let i = 0; i < 9; i++) {
-        board[i] = '';
-    }
-    resultText.innerHTML = '';
-    playerText.innerHTML = `${currentMove} to move`;
-    playAgainButton.style.display = 'none';
-    if (currentMove === AIplayer && enableAI) {botPick()}
-}
-
-// THE AI
+// THE AI PLAYER
 function botPick () {
-    //const board = Array.from(buttons).map(button => button.innerHTML);
     let emptyTiles = [];
-    for (const button of buttons) {button.disabled = true}
-    for (let i = 0; i < 9; i++) { // 
+    for (const button of buttons) {button.disabled = true} // Disable all buttons
+    for (let i = 0; i < 9; i++) { // Create empty tiles array
         if(board[i] === '') {
             emptyTiles.push(i);
         }
     }
     const randomIndex = Math.floor(Math.random() * emptyTiles.length);
-    console.log(emptyTiles);
+    //console.log(emptyTiles);
     
     if (!gameOver) {
         setTimeout(() => { 
-            // AI itself
+            // AI logic
             let analysisBoard = [];
-            let oneTurn = false;
+            let oneTurn = false; 
             copyArray(board, analysisBoard);
             console.log(analysisBoard);
             for (let i = 0; i < emptyTiles.length; i++) { // 1 turn win check
-                analysisBoard[emptyTiles[i]] = currentMove;
-                if(checkLocalWin(analysisBoard) === 1) {
+                analysisBoard[emptyTiles[i]] = currentMove; // Try every position possible after own move
+                if(checkLocalWin(analysisBoard) === 1) { // If it is winning,
                     oneTurn = true;
-                    fillCell(emptyTiles[i]);
+                    fillCell(emptyTiles[i]); // Play it and get out of the cycle
                     break;
                 }
-                copyArray(board, analysisBoard);
+                copyArray(board, analysisBoard); // If it wasn't a win, return the analysis board to current state
             }
             for (let i = 0; i < emptyTiles.length; i++) { // 1 turn loss check
-                analysisBoard[emptyTiles[i]] = currentMove === 'O' ? 'X' : 'O';
-                if(checkLocalWin(analysisBoard) === 0) {
+                analysisBoard[emptyTiles[i]] = currentMove === 'O' ? 'X' : 'O'; // Try every cell with opposite element
+                if(checkLocalWin(analysisBoard) === 0) { // If it is losing,
                     oneTurn = true;
-                    fillCell(emptyTiles[i]);
+                    fillCell(emptyTiles[i]); // Stop the opponent by filling that cell yourself
                     break;
                 }
-                copyArray(board, analysisBoard);
+                copyArray(board, analysisBoard); // And if it wasn't, return the analysis board to current state
             }
             if (board[4] === '' && !oneTurn) { // If center is free - better take it
                 oneTurn = true;
                 fillCell(4);
-            } else if (arrayInter(emptyTiles, [0,2,6,8]).map((x) => x === 'X').length === 2 && !oneTurn) {
-                oneTurn = true; // Counter against two corners strategy
-                console.log("We got here, now what?");
+            } else if (((board[2] === board[6] && board[6] === 'X') || (board[0] === board[8] && board[8] === 'X')) && emptyTiles.length === 6 && !oneTurn) {
+                oneTurn = true; // Counter against opposite corners strategy (pick the edge instead of corner)
                 fillCell(arrayInter(emptyTiles, [1,3,5,7])[Math.floor(Math.random() * arrayInter(emptyTiles, [1,3,5,7]).length)])
-            } else if (!board.includes(AIplayer) && !oneTurn) {
-                oneTurn = true; // If center is taken and our first turn, take corner
-                fillCell([0,2,6,8][Math.floor(Math.random() * 4)])
             } else if((arrayInter(emptyTiles, [0,2,6,8]).length !== 0) && !oneTurn) {
                 oneTurn = true; // Corners have bigger priority
                 const emptyCorners = arrayInter(emptyTiles, [0,2,6,8]);
                 fillCell(emptyCorners[Math.floor(Math.random() * emptyCorners.length)]);
             } else if (!oneTurn) {
-                fillCell(emptyTiles[randomIndex]);
+                fillCell(emptyTiles[randomIndex]); // Fill random cell if nothing above happened
             }
-            // End AI
-            for (const button of buttons) {button.disabled = false};
+            // End of AI logic
+            for (const button of buttons) {button.disabled = false}; // Enable all buttons back
         }, 700)
     };
     
 }
 
-function copyArray(fromBoard, toBoard) {
-    for (let i = 0; i < 9; i++) {
-        toBoard[i] = fromBoard[i];
-    }
-}
-
-function arrayInter(array1, array2) {
-    return (array1.filter(value => array2.includes(value)))
-}
-
-function checkLocalWin (board) {
-    //console.log(board);
-
+function checkLocalWin (board) { // Check the win but only return the result for AIplayer
     for (const combination of winningCombinations) {
         const [a, b, c] = combination;
         if (board[a] === board[b] && board[a] === board[c] && board[a] !== "" && board[a] === AIplayer) {
@@ -166,16 +108,70 @@ function checkLocalWin (board) {
             return 0;
         };    
     };
+}
+
+// Check win on current global board
+function checkWin () {
+    console.log(board);
+
+    for (const combination of winningCombinations) { // Checking every combination
+        const [a, b, c] = combination;
+        if (board[a] !== "" && board[a] === board[b] && board[a] === board[c]) {
+            highlightWinningCells(a, b, c);
+            endGame(`Winner: ${board[a]}`, board[a]); // If we got one of combinations, end the game
+        };    
+    };
     
-    if (!board.includes('')) {
-        return 0.5;
+    if (!board.includes('') && !gameOver) { // If the board is full then it's a draw
+        endGame('Draw', undefined);
+        draws++;
+        document.getElementById('draws').innerHTML = draws;
     }
 }
 
-// DISPLAY FUNCTIONS
+function endGame(message, winner) {
+    if (winner === AIplayer) { // 
+        botScore++;
+        document.getElementById('botScore').innerHTML = botScore;
+    } else if (winner === ((AIplayer === 'X') ? 'O' : 'X')) {
+        playerScore++;
+        document.getElementById('playerScore').innerHTML = playerScore;
+    }
+    resultText.innerHTML = message;
+    playerText.innerHTML = 'Game over';
+    playAgainButton.style.display = 'block';
+    gameOver = true;
+}
+
+// Start the game over
+function playAgain () {
+    for (cell of buttons) {
+        cell.innerHTML = ''; // Clean the board
+        cell.classList.remove('winningCell');
+    };
+    gameOver = false;
+    currentMove = 'X';
+    board = ['','','','','','','','','']
+    resultText.innerHTML = '';
+    playerText.innerHTML = `${currentMove} to move`;
+    playAgainButton.style.display = 'none'; // Hide the "Play again" button
+    if (currentMove === AIplayer && enableAI) {botPick()}
+}
+
+// ARRAY FUNCTIONS
+function copyArray(fromArray, toArray) { // Copies array of nine elements
+    for (let i = 0; i < 9; i++) {
+        toArray[i] = fromArray[i];
+    };
+}
+
+function arrayInter(array1, array2) { // Returns array of common elements
+    return (array1.filter(value => array2.includes(value)))
+}
+
 function toggleAI () {
     enableAI = !enableAI;
-    if (currentMove === AIplayer) {botPick()};
+    if (currentMove === AIplayer && !gameOver) {botPick()};
     if (enableAI) {
         document.getElementsByClassName('whoAI__div')[0].style.display = 'block';
     } else {
@@ -185,19 +181,11 @@ function toggleAI () {
 
 function changeAI () {
     AIplayer = AIplayer === 'X' ? 'O' : 'X';
-    if (currentMove === AIplayer) {botPick()};
+    if (currentMove === AIplayer && !gameOver) {botPick()};
 }
 
 function highlightWinningCells (...cellIds) {
     for (const id of cellIds) {
         buttons[id].classList.add('winningCell');
     }
-}
-// END DISPLAY FUNCTIONS
-
-function endGame(message) {
-    resultText.innerHTML = message;
-    playerText.innerHTML = 'Game over';
-    playAgainButton.style.display = 'block';
-    gameOver = true;
 }
