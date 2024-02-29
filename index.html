@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic tac toe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <table id="gameTable">
+        <tr>
+            <td><button id="0" onclick="fillCell(0)" class="gameCell"></button></td>
+            <td><button id="1" onclick="fillCell(1)" class="gameCell"></button></td>
+            <td><button id="2" onclick="fillCell(2)" class="gameCell"></button></td>
+        </tr>
+        <tr>
+            <td><button id="3" onclick="fillCell(3)" class="gameCell"></button></td>
+            <td><button id="4" onclick="fillCell(4)" class="gameCell"></button></td>
+            <td><button id="5" onclick="fillCell(5)" class="gameCell"></button></td>
+        </tr>
+        <tr>
+            <td><button id="6" onclick="fillCell(6)" class="gameCell"></button></td>
+            <td><button id="7" onclick="fillCell(7)" class="gameCell"></button></td>
+            <td><button id="8" onclick="fillCell(8)" class="gameCell"></button></td>
+        </tr>
+    </table>
+    <div class="text">
+        <p id="result"></p>
+        <p id="player">X to move</p>
+        <button onclick="playAgain()" id="playAgainButton">Play again</button>
+        <div class="div__checkbox">
+            <input type="checkbox" id="enableAI" onchange="toggleAI()" class="checkbox"/>
+            <label for="enableAI">Enable AI</label>
+            <div class="whoAI__div">
+                <input type="checkbox" id="whoAI" onchange="changeAI()" class="checkbox"/>
+                <label for="whoAI" id="labelAI">Switch team</label>
+                <!-- <input type="range" id="levelAI" name="difficulty"/>
+                <label for="difficulty" id="labelAI">Difficulty</label> -->
+            </div>
+            <div class="whoAI__div">
+                
+            </div>
+            
+        </div>
+    </div>
+    <div class="scoreboard">
+        <table>
+            <tr>
+                <td>Player score</td>
+                <td id="playerScore">0</td>
+            </tr>
+            <tr>
+                <td>Draws</td>
+                <td id="draws">0</td>
+            </tr>
+            <tr>
+                <td>Bot score</td>
+                <td id="botScore">0</td>
+            </tr> 
+        </table>
+    </div>
+    <script src="app.js"></script>    
+</body>
+</html>

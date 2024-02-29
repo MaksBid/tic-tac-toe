@@ -1,0 +1,60 @@
+body {
+    background-color: #252525;
+    display: flex;
+    color: #f0f0f0;
+}
+
+p {
+    padding-left: 50px;
+    font-size: 50px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.gameCell {
+    background-color: #303030;
+    color: #f0f0f0;
+    width: 200px;
+    height: 200px;
+    font-size: 120px;
+}
+
+.winningCell {
+    background-color: #f0f0f0;
+    color: #303030;
+}
+
+.text button {
+    background-color: #303030;
+    color: #f0f0f0;
+    width: 300px;
+    height: 100px;
+    font-size: 50px;
+    margin-left: 50px;
+    display: none;    
+}
+
+.div__checkbox {
+    display: block;
+    padding: 50px;
+    color: #f0f0f0;
+    font-size: 20px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.checkbox {
+    transform: scale(1.5);
+}
+
+.whoAI__div {
+    display: none;
+}
+
+.scoreboard {
+    padding: 50px 0 0px 50px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.scoreboard table tr td {
+    font-size: 30px;
+    width: 200px;
+}
